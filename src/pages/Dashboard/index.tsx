@@ -1,8 +1,8 @@
-import React from "react";
-import { FiChevronRight } from "react-icons/fi";
+import React from 'react';
+import { FiChevronRight } from 'react-icons/fi';
 
-import logo from "../../assets/logo.svg";
-import { Title, Form, Repositories } from "./styles";
+import logo from '../../assets/logo.svg';
+import { Title, Form, Repositories } from './styles';
 
 // FC = FunctionComponent
 const Dashboard: React.FC = () => {

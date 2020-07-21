@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 // FC = FunctionComponent
 const Repository: React.FC = () => {
