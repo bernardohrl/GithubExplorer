@@ -1,17 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouteMatch, Link } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
-import { Header, RepositoryInfo, Issues } from './styles';
+import api from '../../services/api';
 import logo from '../../assets/logo.svg';
+import { Issue, Repository } from '../../models';
+import { Header, RepositoryInfo, Issues } from './styles';
 
-interface RepositoryParams {
+interface RouteParams {
     repository: string;
 }
 
 // FC = FunctionComponent
-const Repository: React.FC = () => {
-    const { params } = useRouteMatch<RepositoryParams>();
+const RepositoryDeatails: React.FC = () => {
+    const { params } = useRouteMatch<RouteParams>();
+    const [repository, setRepository] = useState<Repository | null>(null);
+    const [issues, setissues] = useState<Issue[]>([]);
+
+    useEffect(() => {
+        // Há duas opções para fazer a requisição:
+        // 1ª
+        api.get(`repos/${params.repository}`).then((response) => {
+            console.log(response.data);
+
+            setRepository(response.data);
+        });
+        api.get(`repos/${params.repository}/issues`).then((response) => {
+            setissues(response.data);
+        });
+
+        // 2ª
+        // async function loadData(): Promise<void> {
+        //     const [repository, issues] = await Promise.all(
+        //         api.get(`repos/${params.repository}`),
+        //         api.get(`repos/${params.repository}/issues`)
+        //     );
+        //     // Set Data
+        // }
+        // loadData();
+    }, [params.repository]);
 
     return (
         <>
@@ -26,42 +53,41 @@ const Repository: React.FC = () => {
 
             <RepositoryInfo>
                 <header>
-                    <img
-                        src="https://avatars2.githubusercontent.com/u/20937488?s=460&u=5e8d3b43e8eb6c38562caf172224e972b5bc9856&v=4"
-                        alt="User"
-                    />
+                    <img src={repository?.owner.avatar_url} alt="User" />
                     <div>
-                        <strong>gobarber/frontend</strong>
-                        <p>Repositório para fazer várias coisas e etc</p>
+                        <strong>{repository?.full_name}</strong>
+                        <p>{repository?.description}</p>
                     </div>
                 </header>
                 <ul>
                     <li>
-                        <strong> 1808 </strong>
+                        <strong> {repository?.stargazers_count} </strong>
                         <span>Stars</span>
                     </li>
                     <li>
-                        <strong> 50 </strong>
+                        <strong> {repository?.forks_count} </strong>
                         <span>Forks</span>
                     </li>
                     <li>
-                        <strong> 92 </strong>
+                        <strong> {repository?.open_issues_count} </strong>
                         <span>Issues Abertas</span>
                     </li>
                 </ul>
             </RepositoryInfo>
 
             <Issues>
-                <Link to="?">
-                    <div>
-                        <strong> Nome da Issue </strong>
-                        <p> Descrição da Issue </p>
-                    </div>
-                    <FiChevronRight size={20} />
-                </Link>
+                {issues.map((issue) => (
+                    <a href={issue.html_url}>
+                        <div key={issue.id}>
+                            <strong> {issue.title} </strong>
+                            <p> {issue.user.login} </p>
+                        </div>
+                        <FiChevronRight size={20} />
+                    </a>
+                ))}
             </Issues>
         </>
     );
 };
 
-export default Repository;
+export default RepositoryDeatails;
